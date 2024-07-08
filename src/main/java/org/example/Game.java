@@ -7,14 +7,13 @@ public class Game {
 
     // Constructor
     public Game() {
-        gameRunning = false;
         uInp = new UserInput();
     }
 
     // Game control
     public void PlayGame() {
         Setup();
-        gameBoard.PrintBoard();
+        gameBoard.PrintRevealedBoard();
         while (gameRunning) {
             GameLoop();
         }
@@ -42,15 +41,27 @@ public class Game {
     // Gameplay loop, prints current board state, prompts the user to make a move, then updates the board
     public void GameLoop() {
         gameBoard.PrintBoard();
-        String userInput = uInp.PromptUser();
-        gameRunning = gameBoard.Update();
-        if (userInput.equalsIgnoreCase("quit")) {
+        String[] userInput = uInp.PromptUser();
+        if (userInput[0].equalsIgnoreCase("quit")) {
             gameRunning = false;
+        } else {
+            int xPos = Integer.parseInt(userInput[0]);
+            int yPos = Integer.parseInt(userInput[1]);
+            String chosenTileValue = gameBoard.visualBoard.get(xPos).get(yPos).GetValue();
+            if (chosenTileValue.equalsIgnoreCase("X")) {
+                EndGame();
+            } else {
+
+            }
+            gameBoard.visualBoard.get(xPos).get(yPos).RevealTile();
         }
+        gameRunning = gameBoard.Update();
     }
 
-    // Quit the game (could output session stats?)
+    // Quit the game
     public void EndGame() {
+        gameBoard.PrintBoard();
+        gameBoard.PrintRevealedBoard();
         gameRunning = false;
         System.out.println("Game ended, thank you for playing!");
     }

@@ -11,6 +11,10 @@ public class UserInput {
         return GetHandledInput("int");
     }
 
+    public String GetString() {
+        return GetHandledInput("String");
+    }
+
     // Type checked input with no exception
     public String GetHandledInput(String type) {
         String output = "";
@@ -19,14 +23,17 @@ public class UserInput {
             errorMessage = switch (type) {
                 case "double" -> {
                     output = String.valueOf(sc.nextDouble());
+                    sc.nextLine();
                     yield "Please input a double";
                 }
                 case "float" -> {
                     output = String.valueOf(sc.nextFloat());
+                    sc.nextLine();
                     yield "Please input a float";
                 }
                 case "int" -> {
                     output = String.valueOf(sc.nextInt());
+                    sc.nextLine();
                     yield "Please input an int";
                 }
                 case "String" -> {
@@ -51,14 +58,17 @@ public class UserInput {
             errorMessage = switch (type) {
                 case "double" -> {
                     output = String.valueOf(sc.nextDouble());
+                    sc.nextLine();
                     yield "Please input a double";
                 }
                 case "float" -> {
                     output = String.valueOf(sc.nextFloat());
+                    sc.nextLine();
                     yield "Please input a float";
                 }
                 case "int" -> {
                     output = String.valueOf(sc.nextInt());
+                    sc.nextLine();
                     yield "Please input an int";
                 }
                 case "String" -> {
@@ -116,9 +126,9 @@ public class UserInput {
 
     // Prompt user for custom board dimensions
     public int[] GetDimensions() {
-        System.out.println("How wide would you like the board to be (suggested: 10)");
+        System.out.println("How wide would you like the board to be? (Suggested: 10)");
         int width = Integer.parseInt(GetInt());
-        System.out.println("How tall would you like the board to be (suggested: 10");
+        System.out.println("How tall would you like the board to be? (Suggested: 10)");
         int height = Integer.parseInt(GetInt());
         int size = width * height;
         return new int[]{width, height, size};
@@ -126,15 +136,23 @@ public class UserInput {
 
     // Prompt user for number of mines on custom board
     public int GetCustomMines(int size) {
-        System.out.println("How many mines would you like (maximum: " + size);
-        return Integer.parseInt(GetInt());
+        // Some formula that determines the maximum number of mines given the size (for now it is half the board)
+        int maxMines = size / 2;
+        System.out.println("How many mines would you like (maximum: " + maxMines + ")");
+        int chosenMines = Integer.parseInt(GetInt());
+        if (chosenMines <= maxMines) {
+            return chosenMines;
+        } else {
+            return GetCustomMines(size);
+        }
     }
 
-    // Generic user turn prompt
-    public String PromptUser() {
+    // Prompt and input gathering for the standard user turn
+    public String[] PromptUser() {
         System.out.println("Please enter the position of the tile you would like to reveal. \n" +
                 "e.g. \"0,0\" for the top left tile, \"0,1\" for the tile to the right, and \"1,0\" for the tile below.");
-        return String.valueOf(GetHandledInput("String"));
+        String userInput = String.valueOf(GetString());
+        return userInput.split("\\s*,\\s*");
     }
 
 
