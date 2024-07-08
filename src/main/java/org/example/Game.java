@@ -5,78 +5,51 @@ public class Game {
     boolean gameRunning;
     Board gameBoard;
 
+    // Constructor
     public Game() {
         gameRunning = false;
+        uInp = new UserInput();
     }
 
+    // Game control
     public void PlayGame() {
         Setup();
+        gameBoard.PrintBoard();
         while (gameRunning) {
             GameLoop();
         }
+        EndGame();
     }
 
+    // Setting up the board and the game
     public void Setup() {
-        String choice = GetBoardChoice();
+        Board board = null;
+        String choice = uInp.GetBoardChoice();
         if (choice.equalsIgnoreCase("preset")) {
-            String style = GetBoardStyle();
+            String style = uInp.GetBoardStyle();
+            board = new Board(style);
         } else {
-
-            GetDimensions();
+            int[] dimensions = uInp.GetDimensions();
+            int maxMines = uInp.GetCustomMines(dimensions[2]);
+            board = new Board(dimensions, maxMines);
         }
-        Board board = new Board(style);
+        board.CreateBoard();
         board.PopulateBoard();
+        gameRunning = true;
+        gameBoard = board;
     }
 
-    private String GetBoardChoice() {
-        System.out.println("Would you like to use a preset board size, or enter a custom one?" +
-                "Enter 1 to choose a preset board size, or 2 to choose a custom board size.");
-        int choice = Integer.parseInt(uInp.GetHandledInput("int"));
-        String chosenOption = "";
-        if (choice == 1) {
-            chosenOption = "preset";
-        } else if (choice == 2) {
-            chosenOption = "custom";
-        } else {
-            GetBoardChoice();
-        }
-        return chosenOption;
-    }
-
-    private String GetBoardStyle() {
-        System.out.println("Would you like to play \"Beginner\", \"Intermediate\", or \"Expert\"?" +
-                "Enter 1 to choose \"Beginner\", 2 to choose \"Intermediate\", or 3 to choose \"Expert\".");
-        int choice = Integer.parseInt(uInp.GetHandledInput("int"));
-        String chosenStyle = "";
-        if (choice == 1) {
-            chosenStyle = "beginner";
-        } else if (choice == 2) {
-            chosenStyle = "intermediate";
-        } else if (choice == 3) {
-            chosenStyle = "expert";
-        } else {
-            GetBoardStyle();
-        }
-        return chosenStyle;
-    }
-
+    // Gameplay loop, prints current board state, prompts the user to make a move, then updates the board
     public void GameLoop() {
         gameBoard.PrintBoard();
-        PromptUser();
-        gameBoard.Update();
+        String userInput = uInp.PromptUser();
+        gameRunning = gameBoard.Update();
+        if (userInput.equalsIgnoreCase("quit")) {
+            gameRunning = false;
+        }
     }
 
-    private void PromptUser() {
-    }
-
-    public int[] GetDimensions() {
-        System.out.println("How wide would you like the board to be (suggested: 10)");
-        int width = Integer.parseInt(uInp.GetInt());
-        System.out.println("How tall would you like the board to be (suggested: 10");
-        int height = Integer.parseInt(uInp.GetInt());
-        return new int[]{width, height};
-    }
-
+    // Quit the game (could output session stats?)
     public void EndGame() {
         gameRunning = false;
         System.out.println("Game ended, thank you for playing!");

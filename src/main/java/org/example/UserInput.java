@@ -4,19 +4,11 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UserInput {
-    Scanner sc;
+    Scanner sc = new Scanner(System.in);
 
     // Can't return an int if there's a possibility of trying to handle errors or return "done"
     public String GetInt() {
         return GetHandledInput("int");
-    }
-
-    public String GetInt(String exception) {
-        return GetHandledInput("int", exception);
-    }
-
-    public String GetStr() {
-
     }
 
     // Type checked input with no exception
@@ -87,5 +79,63 @@ public class UserInput {
         }
         return output;
     }
+
+    // Prompt user to choose between preset or custom board
+    public String GetBoardChoice() {
+        System.out.println("\nWould you like to use a preset board size, or enter a custom one?\n" +
+                "Enter 1 to choose a preset board size, or 2 to choose a custom board size.");
+        int choice = Integer.parseInt(GetHandledInput("int"));
+        String chosenOption = "";
+        if (choice == 1) {
+            chosenOption = "preset";
+        } else if (choice == 2) {
+            chosenOption = "custom";
+        } else {
+            GetBoardChoice();
+        }
+        return chosenOption;
+    }
+
+    // Prompt user to choose preset board style
+    public String GetBoardStyle() {
+        System.out.println("\nWould you like to play \"Beginner\", \"Intermediate\", or \"Expert\"?\n" +
+                "Enter 1 to choose \"Beginner\", 2 to choose \"Intermediate\", or 3 to choose \"Expert\".");
+        int choice = Integer.parseInt(GetHandledInput("int"));
+        String chosenStyle = "";
+        if (choice == 1) {
+            chosenStyle = "beginner";
+        } else if (choice == 2) {
+            chosenStyle = "intermediate";
+        } else if (choice == 3) {
+            chosenStyle = "expert";
+        } else {
+            GetBoardStyle();
+        }
+        return chosenStyle;
+    }
+
+    // Prompt user for custom board dimensions
+    public int[] GetDimensions() {
+        System.out.println("How wide would you like the board to be (suggested: 10)");
+        int width = Integer.parseInt(GetInt());
+        System.out.println("How tall would you like the board to be (suggested: 10");
+        int height = Integer.parseInt(GetInt());
+        int size = width * height;
+        return new int[]{width, height, size};
+    }
+
+    // Prompt user for number of mines on custom board
+    public int GetCustomMines(int size) {
+        System.out.println("How many mines would you like (maximum: " + size);
+        return Integer.parseInt(GetInt());
+    }
+
+    // Generic user turn prompt
+    public String PromptUser() {
+        System.out.println("Please enter the position of the tile you would like to reveal. \n" +
+                "e.g. \"0,0\" for the top left tile, \"0,1\" for the tile to the right, and \"1,0\" for the tile below.");
+        return String.valueOf(GetHandledInput("String"));
+    }
+
 
 }
