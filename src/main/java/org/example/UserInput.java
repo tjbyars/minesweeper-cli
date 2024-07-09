@@ -136,8 +136,7 @@ public class UserInput {
 
     // Prompt user for number of mines on custom board
     public int GetCustomMines(int size) {
-        // Some formula that determines the maximum number of mines given the size (for now it is half the board)
-        int maxMines = size / 2;
+        int maxMines = size / 2;    // (x-1)(y-1)
         System.out.println("How many mines would you like (maximum: " + maxMines + ")");
         int chosenMines = Integer.parseInt(GetInt());
         if (chosenMines <= maxMines) {

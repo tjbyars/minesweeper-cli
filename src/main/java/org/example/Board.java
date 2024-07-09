@@ -19,8 +19,20 @@ public class Board {
     int width;
     int height;
     int totalMines;
-    int currentMines;
+    int currentTiles;
     ArrayList<ArrayList<Tile>> visualBoard = new ArrayList<ArrayList<Tile>>();
+
+//    public static final String ANSI_RESET = "\u001B[0m";
+//    public static final String ANSI_RED = "\u001B[31m";
+//    public static final String ANSI_BLUE = "\u001B[34m";
+//    public static final String ANSI_GREEN = " \u001B[32m";
+//    public static final String ANSI_YELLOW = "\u001B[33m";
+//    public static final String ANSI_MAGENTA = "\u001B[35m";
+//    public static final String ANSI_CYAN = "\u001B[36m";
+//    public static final String ANSI_BACKGROUND_RED = "\u001B[41m";
+//    public static final String ANSI_BACKGROUND_GREEN = "\u001B[42m";
+    // Wanted to try this, but I think it would need the board printing to be entirely reworked to print each tile instead of by line
+
 
     // Preset board constructor
     public Board(String style) {
@@ -54,13 +66,11 @@ public class Board {
 
     // Initialise the board (arraylists) with empty tiles)
     public void CreateBoard() {
-        currentMines = totalMines;
+        currentTiles = (width * height) - totalMines;
         for (int i = 0; i <= width; i++) {
             ArrayList<Tile> row = new ArrayList<Tile>();
             for (int j = 0; j <= height; j++) {
-//                System.out.println("xPos: " + i + " yPos: " + j);
-//                visualBoard.get(i).set(j, "O");
-                Tile tile = new Tile();
+                Tile tile = new Tile(i, j);
                 tile.SetState("Hidden");
                 row.add(tile);
             }
@@ -101,7 +111,6 @@ public class Board {
     private void PlaceTiles() {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-//                System.out.println("xPos: " + i + " yPos: " + j);
                 visualBoard.get(i).get(j).SetValue(CalculateValue(i, j));
             }
         }
@@ -109,8 +118,6 @@ public class Board {
 
     // Calculate the value of a tile based on adjacent mines
     private String CalculateValue(int row, int column) {
-//        System.out.println("Row: " + row + " Column: " + column);
-//        System.out.println("Width: "  + width + " Height: " + height);
         if (visualBoard.get(row).get(column).GetValue().equalsIgnoreCase("X")) { // position holds a mine
             return "X";
         } else {
@@ -119,52 +126,42 @@ public class Board {
             boolean atBottom = row == height - 1;
             boolean atLeft = column == 0;
             boolean atRight = column == width - 1;
-            // if not at top, check above
-            if (!atTop) {
-                //            System.out.println(visualBoard.get(row));
-                //            System.out.println(visualBoard.get(row - 1));
+            if (!atTop) {   // check above
                 if (visualBoard.get(row - 1).get(column).GetValue().equals("X")) {
                     value++;
                 }
-                // check top left corner
-                if (!atLeft) {
+                if (!atLeft) {  // check top left corner
                     if (visualBoard.get(row - 1).get(column - 1).GetValue().equals("X")) {
                         value++;
                     }
                 }
-                // check top right corner
-                if (!atRight) {
+                if (!atRight) { // check top right corner
                     if (visualBoard.get(row - 1).get(column + 1).GetValue().equals("X")) {
                         value++;
                     }
                 }
             }
-            // if not at bottom, check below
-            if (!atBottom) {
+            if (!atBottom) {    // if not at bottom, check below
                 if (visualBoard.get(row + 1).get(column).GetValue().equals("X")) {
                     value++;
                 }
-                // check bottom left corner
-                if (!atLeft) {
+                if (!atLeft) {  // check bottom left corner
                     if (visualBoard.get(row + 1).get(column - 1).GetValue().equals("X")) {
                         value++;
                     }
                 }
-                // check bottom right corner
-                if (!atRight) {
+                if (!atRight) { // check bottom right corner
                     if (visualBoard.get(row + 1).get(column + 1).GetValue().equals("X")) {
                         value++;
                     }
                 }
             }
-            // if not at left, check left
-            if (!atLeft) {
+            if (!atLeft) {  // if not at left, check left
                 if (visualBoard.get(row).get(column - 1).GetValue().equals("X")) {
                     value++;
                 }
             }
-            // if not at right, check right
-            if (!atRight) {
+            if (!atRight) { // if not at right, check right
                 if (visualBoard.get(row).get(column + 1).GetValue().equals("X")) {
                     value++;
                 }
@@ -176,15 +173,26 @@ public class Board {
     // Output the board to console
     public void PrintBoard() {
         System.out.println("\nCurrent board:");
+        StringBuilder rowNumbers = new StringBuilder();
+        rowNumbers.append("     ");
+        StringBuilder rowDashes = new StringBuilder();
+        rowDashes.append("   ");
+        for (int i = 0; i < height; i++) {
+            rowNumbers.append(i).append("   ");
+            rowDashes.append("----");
+        }
+        System.out.println(rowNumbers);
+        System.out.println(rowDashes);
         for (int i = 0; i < width; i++) {
             StringBuilder rowOutput = new StringBuilder();
+            rowOutput.append(i).append(" | ");
             for (int j = 0; j < height; j++) {
                 if (visualBoard.get(i).get(j).GetState().equalsIgnoreCase("Hidden")) {
                     rowOutput.append("[ ]");
                 } else {
                     rowOutput.append("[").append(visualBoard.get(i).get(j).GetValue()).append("]");
                 }
-                rowOutput.append("   ");
+                rowOutput.append(" ");
             }
             System.out.println(rowOutput);
         }
@@ -194,20 +202,86 @@ public class Board {
     // Output the full revealed board to console
     public void PrintRevealedBoard() {
         System.out.println("\nCurrent board:");
+        StringBuilder rowNumbers = new StringBuilder();
+        rowNumbers.append("     ");
+        StringBuilder rowDashes = new StringBuilder();
+        rowDashes.append("   ");
+        for (int i = 0; i < height; i++) {
+            rowNumbers.append(i).append("   ");
+            rowDashes.append("----");
+        }
+        System.out.println(rowNumbers);
+        System.out.println(rowDashes);
         for (int i = 0; i < width; i++) {
             StringBuilder rowOutput = new StringBuilder();
+            rowOutput.append(i).append(" |");
             for (int j = 0; j < height; j++) {
+                rowOutput.append("  ");
                 rowOutput.append(visualBoard.get(i).get(j).GetValue());
-                rowOutput.append("   ");
+                rowOutput.append(" ");
             }
             System.out.println(rowOutput);
         }
         System.out.println("\n");
     }
 
-    // Update the board (after user has played a turn)
+    // Return all adjacent tiles as a list
+    public ArrayList<Tile> GetAdjacentTiles(Tile tile) {
+        ArrayList<Tile> adjacents = new ArrayList<Tile>();
+        int xPos = tile.GetX();     // Issue was here
+        int yPos = tile.GetY();
+        if (xPos > 0) {
+            adjacents.add(visualBoard.get(xPos - 1).get(yPos));             // Left
+            if (yPos > 0) {
+                adjacents.add(visualBoard.get(xPos - 1).get(yPos - 1));     // Up left corner
+            }
+            if (yPos < height - 1) {
+                adjacents.add(visualBoard.get(xPos - 1).get(yPos + 1));     // Down left corner
+            }
+        }
+        if (xPos < width - 1) {
+            adjacents.add(visualBoard.get(xPos + 1).get(yPos));             // Right
+            if (yPos > 0) {
+                adjacents.add(visualBoard.get(xPos + 1).get(yPos - 1));     // Up right corner
+            }
+            if (yPos < height - 1) {
+                adjacents.add(visualBoard.get(xPos + 1).get(yPos + 1));     // Down right corner
+            }
+        }
+        if (yPos > 0) {
+            adjacents.add(visualBoard.get(xPos).get(yPos - 1));             // Up
+        }
+        if (yPos < height - 1) {
+            adjacents.add(visualBoard.get(xPos).get(yPos + 1));             // Down
+        }
+        return adjacents;
+    }
+
+    // Check the chosen tile, and reveal all relevant adjacent tiles
+    public void RevealAdjacentTiles(Tile chosenTile, ArrayList<Tile> checkedTiles) {
+        checkedTiles.add(chosenTile);
+        if (chosenTile.GetState().equalsIgnoreCase("Hidden")) {
+            if (chosenTile.GetValue().equalsIgnoreCase("X")){
+                chosenTile.RevealTile();
+                currentTiles--;
+            } else if (chosenTile.GetValue().equalsIgnoreCase("0")) {
+                chosenTile.RevealTile();
+                currentTiles--;
+                ArrayList<Tile> adjacentTiles = this.GetAdjacentTiles(chosenTile);
+                for (Tile tile : adjacentTiles) {
+                    if (!checkedTiles.contains(tile)) {
+                        RevealAdjacentTiles(tile, checkedTiles);
+                    }
+                }
+            } else {
+                chosenTile.RevealTile();
+                currentTiles--;
+            }
+        }
+    }
+
+    // Update whether the game is finished or not
     public boolean Update() {
-        // Clearing algorithm
-        return currentMines != 0;
+        return currentTiles != 0;
     }
 }

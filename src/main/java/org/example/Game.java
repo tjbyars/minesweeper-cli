@@ -1,5 +1,8 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Game {
     UserInput uInp;
     boolean gameRunning;
@@ -13,7 +16,7 @@ public class Game {
     // Game control
     public void PlayGame() {
         Setup();
-        gameBoard.PrintRevealedBoard();
+//        gameBoard.PrintRevealedBoard();
         while (gameRunning) {
             GameLoop();
         }
@@ -44,18 +47,21 @@ public class Game {
         String[] userInput = uInp.PromptUser();
         if (userInput[0].equalsIgnoreCase("quit")) {
             gameRunning = false;
+            EndGame();
         } else {
             int xPos = Integer.parseInt(userInput[0]);
             int yPos = Integer.parseInt(userInput[1]);
-            String chosenTileValue = gameBoard.visualBoard.get(xPos).get(yPos).GetValue();
-            if (chosenTileValue.equalsIgnoreCase("X")) {
-                EndGame();
-            } else {
-
+            Tile chosenTile = gameBoard.visualBoard.get(xPos).get(yPos);
+            ArrayList<Tile> checkedTiles = new ArrayList<Tile>();
+            if (chosenTile.GetValue().equalsIgnoreCase("X")) {
+                gameRunning = false;
+                System.out.println("You hit a mine!");
             }
-            gameBoard.visualBoard.get(xPos).get(yPos).RevealTile();
+            gameBoard.RevealAdjacentTiles(chosenTile, checkedTiles);
         }
-        gameRunning = gameBoard.Update();
+        if (gameRunning) {
+            gameRunning = gameBoard.Update();
+        }
     }
 
     // Quit the game
