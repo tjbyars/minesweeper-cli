@@ -6,3 +6,16 @@ public class Main {
         game.PlayGame();
     }
 }
+
+/*
+potential improvements
+	calculateValue and getAdjacents both check adjacents, but differently
+	offset double digit numbers correctly
+	colourful outputs
+	input limits
+features
+	error handling
+	separate mines and flags into subclasses of tile
+	safe start
+	flagging mines
+ */
